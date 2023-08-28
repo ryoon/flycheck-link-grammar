@@ -89,24 +89,20 @@ po.max_parse_time = 10   # actual parse timeout may be about twice bigger
 po.spell_guess = True if DISPLAY_GUESSES else False
 po.display_morphology = arg.morphology
 
-while True:
-    try:
-        sentence_text = input(PROMPT)
-    except EOFError:
-        print("EOF")
-        exit(0)
+line_no = 0
 
-    if not is_stdin_atty and sentence_text:
-        if sentence_text[0] == '%':
-            continue
-        if sentence_text[0] == '!': # ignore user-settings for now
-            continue
-        if sentence_text[0] in BATCH_LABELS:
-            sentence_text = sentence_text[1:]
+try:
+    f = open(arg.file)
+    sentence_text = f.readline()
+except:
+    exit(0)
+
+while sentence_text:
+    line_no = line_no + 1
+
     if sentence_text.strip() == '':
+        sentence_text = f.readline()
         continue
-    if not is_stdin_atty:
-        print("\n" + sentence_text)
 
     sent = Sentence(str(sentence_text), lgdict, po)
     try:
@@ -114,23 +110,11 @@ while True:
     except LG_TimerExhausted:
         print('Sentence too complex for parsing in ~{} second{}.'.format(
             po.max_parse_time,nsuffix(po.max_parse_time)))
-        continue
     if not linkages:
-        print('Error occurred - sentence ignored.')
-        continue
+        print('Error occurred - sentence ignored.', sentence_text)
     if len(linkages) <= 0:
-        print('Cannot parse the input sentence')
-        continue
+        print('Cannot parse the input sentence', sentence_text)
     null_count = sent.null_count()
-
-    if arg.position:
-        print(' ' * len(PROMPT), end='')
-        for p in range (0, len(sentence_text)):
-            print(p%10, end="")
-        print()
-
-    if null_count == 0:
-        print("Sentence parsed OK", end='')
 
     linkages = list(linkages)
 
@@ -146,27 +130,14 @@ while True:
 
     if correction_found:
         print(" - with correction", end='')
-    if null_count == 0:
-        print(".")
-
-    guess_found = False
-    if DISPLAY_GUESSES:
-        # Check the first linkage for regexed/unknown words
-        for word in linkages[0].words():
-            # search for something[x]
-            if re.search(r'\S+\[[^]]+]', word):
-                guess_found = True
-                break
 
     # Show results with unlinked words or guesses
     if arg.position or guess_found or correction_found or null_count != 0:
-        print('Sentence has {} unlinked word{}:'.format(
-            null_count, nsuffix(null_count)))
         result_no = 0
         uniqe_parse = {}
         for linkage in linkages:
             words = list(linkage.words())
-            if str(words) in uniqe_parse:
+            if str(words) in uniqe_parse or result_no > 0:
                 continue
             result_no += 1
             uniqe_parse[str(words)] = True
@@ -174,16 +145,19 @@ while True:
             if arg.position:
                 words_char = []
                 words_byte = []
+                unlinked_char_nths = []
                 for wi, w in enumerate(words):
                     words_char.append(w + str((linkage.word_char_start(wi), linkage.word_char_end(wi))))
                     words_byte.append(w + str((linkage.word_byte_start(wi), linkage.word_byte_end(wi))))
+                    if w[0] == '[' and w[-1] == ']':
+                        unlinked_char_nths.append(linkage.word_char_start(wi))
 
-                print(u"{}: {}".format(result_no, ' '.join(words_char)))
-                print(u"{}: {}".format(result_no, ' '.join(words_byte)))
-            else:
-                print("{}: {}".format(result_no, ' '.join(words)))
+                for n in unlinked_char_nths:
+                    print(u"{}:LINE:{}:COLUMN:{}: grammartical-error".format(arg.file, line_no, n + 1))
 
     if arg.interactive:
         print("Interactive session (^D to end):")
         import code
         code.interact(local=locals())
+
+    sentence_text = f.readline()
