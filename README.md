@@ -34,3 +34,7 @@ and `notmuch-message-mode`.
 ## Bugs
 * Remove position option.
 * Not optimized at all.
+
+## License
+As same as link-grammar's Python binding examples.
+2-clause BSD-like license.
