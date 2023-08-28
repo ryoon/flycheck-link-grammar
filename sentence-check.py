@@ -31,26 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The views and conclusions contained in the software and documentation are those
 of the authors and should not be interpreted as representing official policies, 
 either expressed or implied, of MetaMetrics.
-
-Note: This only runs with Python3!
-
-Demo: Find unlinked or unknown words.
-These demo is extremely simplified.
-It can only work with link-grammar library version >= 5.3.10.
-Input: English sentences, one per line.
-Output: If there are any []-marked words in the linkage results,
-the output contains unique combinations of the input sentence with
-these works marked.  No attempt is done to handle the walls.
-Spell guesses are not handled in this demo.
-
-Example:
-This is a the test of bfgiuing and xxxvfrg
-Output:
-Sentence has 1 unlinked word:
-1: LEFT-WALL this.p is.v [a] the test.n of bfgiuing[!].g and.j-n xxxvfrg[?].n RIGHT-WALL
-2: LEFT-WALL this.p is.v a [the] test.n of bfgiuing[!].g and.j-n xxxvfrg[?].n RIGHT-WALL
-3: LEFT-WALL this.p is.v [a] the test.n of bfgiuing[!].g and.j-n xxxvfrg[?].a RIGHT-WALL
-4: LEFT-WALL this.p is.v a [the] test.n of bfgiuing[!].g and.j-n xxxvfrg[?].a RIGHT-WALL
 """
 
 import sys
