@@ -57,20 +57,20 @@ PROMPT = "sentence-check: " if is_stdin_atty else ""
 DISPLAY_GUESSES = True   # Display regex and POS guesses
 BATCH_LABELS = '*: '
 
-print("Version:", clg.linkgrammar_get_version())
-
 args = argparse.ArgumentParser(formatter_class=Formatter)
 args.add_argument('lang', nargs='?', default='en',
                   help="language or dictionary location")
 args.add_argument("-v", "--verbosity", type=int,default=0,
                   choices=range(0,199), metavar='[0-199]',
                   help= "1: Basic verbosity; 2-4: Trace; >5: Debug")
-args.add_argument("-p", "--position", action="store_true",
+args.add_argument("-p", "--position", action="store_true", default=True,
                   help="show word sentence position")
 args.add_argument("-nm", "--no-morphology", dest='morphology', action='store_false',
                   help="do not display morphology")
 args.add_argument("-i", "--interactive", action="store_true",
                   help="interactive mode after each result")
+args.add_argument('-f', '--file', nargs='?',
+                  help="input file name")
 
 arg = args.parse_args()
 
