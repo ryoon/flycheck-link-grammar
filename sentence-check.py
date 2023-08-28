@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/pkg/bin/python3.11
 """
 
               LICENSE FOR THE PYTHON BINDINGS TO LINK GRAMMAR
